@@ -1,17 +1,30 @@
+#!/usr/bin/env python
+
 from fpdf import FPDF, XPos, YPos
 from datetime import datetime
-import os
+from sys import exit as _exit
+from os import environ, walk
 
 class FontNotTTFError(Exception): pass
 
 class CurriculumVitae(FPDF):
 
-    def __init__(self, font: str, calemoji: str='') -> None:
+    def __init__(self, h_font: str, bg, calemoji: str='') -> None:
         super().__init__()
-        self.h_font: str = self._ttf(font)
+        self.bg=bg
+        self.h_font: str = self._ttf(h_font)
         self.calemoji: str = chr(0x1F5D3) if not calemoji else calemoji
         self.date: str = datetime.today().strftime('%b %Y')
-        self.h_text: str = f"'{self.calemoji} {self.date}  ')"
+        self.header_text: str = f"{self.calemoji} {self.date}  "
+
+        self.add_page()
+        self.set_font(family='Courier', size=12)
+        if self.bg:
+            self.image(self.bg, 0, 8, w=210)
+            self.set_text_color(255, 255, 255) 
+        else:
+            self.set_text_color(0)
+
 
     def _ttf(self, font) -> str:
     
@@ -23,7 +36,7 @@ class CurriculumVitae(FPDF):
     def _font_path(self, paths: list[str]=[]) -> str:
     
         if not paths:
-            HOME: str = os.environ['HOME']
+            HOME: str = environ['HOME']
             paths = [ 
                     HOME + '/.local/share/fonts/', 
                     HOME + '/.fonts',
@@ -31,50 +44,56 @@ class CurriculumVitae(FPDF):
                     ]
         
         for path in paths:
-            for _, _, fonts in os.walk(path):
+            for _, _, fonts in walk(path):
                 if self.h_font in fonts:
                     return path + self.h_font
         raise LookupError('Font not found. Please specify an existing font')
 
-    def header(self):
-    
-        methods = [
-                'set_margin(0)',
-                'add_font(self.h_font, fname=self._font_path())',
-                'set_font(family=self.h_font, size=16)',
-                'set_fill_color(26, 28, 29)',
-                'set_text_color(255, 255, 255)',
-                'cell(w=0, h=8, align=\'R\',fill=True, txt=' + self.h_text,
-                ]
-        for method in methods:
-            eval(f'self.{method}')
+    def header(self) -> None:
+        '''
+        Sets the header styling with a dark background that takes all the top
+        of the page and has the current month and year at the right edge
+        '''
+        self.set_margin(0)
+        self.add_font(self.h_font, fname=self._font_path())
+        self.set_font(family=self.h_font, size=14)
+        # The dark color for the header background
+        self.set_fill_color(26, 28, 29) 
+        # White color of the date on the header
+        self.set_text_color(255, 255, 255) 
+        self.cell(w=0, h=8, align='R',fill=True, txt=self.header_text)
 
+
+    def text_column(self, file: str, l: int, y: int, w: int) -> None:
+        '''
+        Writes text to the cv by reading file content
+        Args:
+            file (str): the text file with the content of your CurriculumVitae
+            l (int): how much space the text cell must be from the left margin
+            y (int): the position of the text cell in the y coord on the page
+            w (int): how wide the text cell must be
+        '''
+        with open(file) as fh:
+            txt = fh.read()
+        self.set_left_margin(l)
+        self.set_y(y)
+        self.multi_cell(w=w, align='L', txt=txt, markdown=True)
+        self.ln(20)
+
+
+def main(l_column_file: str, r_column_file: str, bg='',
+        emoji_font: str ='Symbola', output_file='cv.pdf'):
+    cv = CurriculumVitae(emoji_font, bg)
+    cv.text_column(l_column_file, 14, 30, 100) # Big Column
+    cv.text_column(r_column_file, 140, -180, 60) # Smaller right collumn
+
+    try:
+        cv.output(output_file)
+        print('\nSaved cv.pdf')
+    except:
+        print('Something went wrong')
+        _exit(1)
 
 if __name__ == '__main__':
 
-
-    pdf = CurriculumVitae('Symbola')
-    pdf.add_page()
-    #top_bar('Symbola')
-    # Left Column
-    pdf.set_font(family='Courier', size=12)
-    pdf.set_text_color(0)
-    pdf.set_margin(12)
-    with open('curri-br') as fh:
-        txt = fh.read()
-    pdf.set_left_margin(20)
-    pdf.set_y(30)
-    pdf.multi_cell(w=100, align='L', txt=txt, markdown=True)
-    pdf.ln(20)
-
-    pdf.set_left_margin(140)
-    pdf.set_y(-180)
-    #pdf.set_y = -200
-
-    with open('contact-skills') as fh:
-        txt = fh.read()
-    pdf.multi_cell(w=50, align='L', txt=txt, markdown=True)
-    pdf.ln(20)
-
-    pdf.output('cv.pdf')
-
+    main('curri-br', 'contact-skills', 'bg.jpg')
