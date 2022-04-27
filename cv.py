@@ -90,8 +90,8 @@ class CurriculumVitae(FPDF):
 def main(l_column_file: str, r_column_file: str, bg='',
         emoji_font: str ='Symbola', output_file='cv.pdf'):
     cv = CurriculumVitae(emoji_font, bg)
-    cv.text_column(l_column_file, 14, 30, 100) # Big Column
-    cv.text_column(r_column_file, 140, -180, 60) # Smaller right collumn
+    cv.text_column(l_column_file, 20, 30, 100) # Big Column
+    cv.text_column(r_column_file, 130, -180, 60) # Smaller right column
 
     try:
         cv.output(output_file)
