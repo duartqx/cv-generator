@@ -1,6 +1,12 @@
 #!/usr/bin/env python
+'''
+    File name: cv.py
+    Author: Diêgo Duarte
+    Date created: 2022/04/26
+    Python Version: 3.10.4
+'''
 
-from fpdf import FPDF, XPos, YPos
+from fpdf import FPDF
 from datetime import datetime
 from sys import exit as _exit
 from os import environ, walk
@@ -89,7 +95,7 @@ def main(l_column_file: str, r_column_file: str, bg='',
 
     try:
         cv.output(output_file)
-        print('\nSaved cv.pdf')
+        print('\nSaved', output_file)
     except:
         print('Something went wrong')
         _exit(1)
