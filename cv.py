@@ -15,7 +15,7 @@ class FontNotTTFError(Exception): pass
 
 class CurriculumVitae(FPDF):
 
-    def __init__(self, font: str, h_font: str='', 
+    def __init__(self, font: str='Courier', h_font: str='', 
                  calemoji: str='', bg: str='') -> None:
         '''
         Instantiates the CurriculumVitae class
@@ -39,14 +39,14 @@ class CurriculumVitae(FPDF):
         self.header_text: str = f"{self.calemoji} {self.date}  "
 
         self.add_page()
+
         if self.bg:
             self.image(self.bg, 0, 8, w=210)
             self.set_text_color(255, 255, 255) 
         else:
             self.set_text_color(0)
 
-
-    def _ttf(self, font) -> str:
+    def _ttf(self, font: str) -> str:
     
         if not font.endswith('.ttf'):
             if '.' in font: raise FontNotTTFError
@@ -82,7 +82,6 @@ class CurriculumVitae(FPDF):
         # White color of the date on the header
         self.set_text_color(255, 255, 255) 
         self.cell(w=0, h=8, align='R',fill=True, txt=self.header_text)
-
 
     def text_column(self, text: str, 
                     l: int, y: int, w: int, 
