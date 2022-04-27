@@ -15,16 +15,30 @@ class FontNotTTFError(Exception): pass
 
 class CurriculumVitae(FPDF):
 
-    def __init__(self, h_font: str, bg, calemoji: str='') -> None:
+    def __init__(self, font: str, h_font: str='', 
+                 calemoji: str='', bg: str='') -> None:
+        '''
+        Instantiates the CurriculumVitae class
+        Args
+            font (str): the font family you want to use for the body text
+            bg (str): the background image name, defaults to an empty string,
+            leave it at that if you want a normal white background
+            h_font (str): the name of the font you want to use on the header,
+            needs to be an emoji font if you want the calendar emoji on the
+            header. defaults to an empty string
+            calemoji (str): the calendar emoji to be shown before the date on
+            the header bar, defaults to 1F5D3 emoji
+
+        '''
         super().__init__()
-        self.bg=bg
+        self.bg: str = bg
+        self.font: str = font
         self.h_font: str = self._ttf(h_font)
         self.calemoji: str = chr(0x1F5D3) if not calemoji else calemoji
         self.date: str = datetime.today().strftime('%b %Y')
         self.header_text: str = f"{self.calemoji} {self.date}  "
 
         self.add_page()
-        self.set_font(family='Courier', size=12)
         if self.bg:
             self.image(self.bg, 0, 8, w=210)
             self.set_text_color(255, 255, 255) 
@@ -70,7 +84,9 @@ class CurriculumVitae(FPDF):
         self.cell(w=0, h=8, align='R',fill=True, txt=self.header_text)
 
 
-    def text_column(self, file: str, l: int, y: int, w: int) -> None:
+    def text_column(self, text: str, 
+                    l: int, y: int, w: int, 
+                    size: int=12) -> None:
         '''
         Writes text to the cv by reading file content
         Args:
@@ -79,19 +95,24 @@ class CurriculumVitae(FPDF):
             y (int): the position of the text cell in the y coord on the page
             w (int): how wide the text cell must be
         '''
-        with open(file) as fh:
-            txt = fh.read()
+        self.set_font(family=self.font, size=size)
         self.set_left_margin(l)
         self.set_y(y)
-        self.multi_cell(w=w, align='L', txt=txt, markdown=True)
+        self.multi_cell(w=w, align='L', txt=text, markdown=True)
         self.ln(20)
 
 
-def main(l_column_file: str, r_column_file: str, bg='',
-        emoji_font: str ='Symbola', output_file='cv.pdf'):
-    cv = CurriculumVitae(emoji_font, bg)
-    cv.text_column(l_column_file, 20, 30, 100) # Big Column
-    cv.text_column(r_column_file, 130, -180, 60) # Smaller right column
+def main(l_column_text: str, r_column_text: str, 
+        font: str='Courier', emoji_font: str ='Symbola',
+        bg='',  output_file='cv.pdf'):
+    cv = CurriculumVitae(font=font, h_font=emoji_font, bg=bg)
+    cv.text_column(l_column_text, 20, 30, 100) # Big Column
+    cv.text_column(r_column_text, 130, 110, 60) # Smaller right column
+
+    # Source Code link 
+    src_link = 'GPLv3 Source Code available at: ' +\
+            'https://github.com/duartqx/cv-generator'
+    cv.text_column(src_link, 36, 280, 160, size=9)
 
     try:
         cv.output(output_file)
@@ -102,4 +123,7 @@ def main(l_column_file: str, r_column_file: str, bg='',
 
 if __name__ == '__main__':
 
-    main('curri-br', 'contact-skills', 'bg.jpg')
+    import curri_br
+    #import curri_en
+
+    main(curri_br.body, curri_br.side_info, bg='bg.jpg')
