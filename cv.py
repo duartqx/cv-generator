@@ -109,13 +109,13 @@ def main(l_column_text: str, r_column_text: str,
     cv.text_column(r_column_text, 130, 110, 60) # Smaller right column
 
     # Source Code link 
-    src_link = 'GPLv3 Source Code available at: ' +\
-            'https://github.com/duartqx/cv-generator'
-    cv.text_column(src_link, 36, 280, 160, size=9)
+    #src_link = 'GPLv3 Source Code available at: ' +\
+    #        'https://github.com/duartqx/cv-generator'
+    #cv.text_column(src_link, 36, 280, 160, size=9)
 
     try:
         cv.output(output_file)
-        print('\nSaved', output_file)
+        print('\nSaved', output_file, '\n')
     except:
         print('Something went wrong')
         _exit(1)
