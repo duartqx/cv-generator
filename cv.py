@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 '''
-    File name: cv.py
-    Author: Diêgo Duarte
-    Date created: 2022/04/26
-    Python Version: 3.10.4
+File name: cv.py
+Author: Diêgo Duarte
+Date created: 2022/04/26
+Python Version: 3.10.4
 '''
 
 from fpdf import FPDF
@@ -28,7 +28,6 @@ class CurriculumVitae(FPDF):
             header. defaults to an empty string
             calemoji (str): the calendar emoji to be shown before the date on
             the header bar, defaults to 1F5D3 emoji
-
         '''
         super().__init__()
         self.bg: str = bg
@@ -103,15 +102,16 @@ class CurriculumVitae(FPDF):
 
 def main(l_column_text: str, r_column_text: str, 
         font: str='Courier', emoji_font: str ='Symbola',
-        bg='',  output_file='cv.pdf'):
+        bg='',  output_file='cv.pdf', footer=False):
     cv = CurriculumVitae(font=font, h_font=emoji_font, bg=bg)
     cv.text_column(l_column_text, 20, 30, 100) # Big Column
     cv.text_column(r_column_text, 130, 110, 60) # Smaller right column
 
-    # Source Code link 
-    #src_link = 'GPLv3 Source Code available at: ' +\
-    #        'https://github.com/duartqx/cv-generator'
-    #cv.text_column(src_link, 36, 280, 160, size=9)
+    if footer:
+        # Source Code link on the footer
+        src_link = 'GPLv3 Source Code available at: ' +\
+                'https://github.com/duartqx/cv-generator'
+        cv.text_column(src_link, 36, 280, 160, size=9)
 
     try:
         cv.output(output_file)
