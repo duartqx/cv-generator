@@ -86,7 +86,7 @@ class CurriculumVitae(FPDF):
                     l: int, y: int, w: int, 
                     size: int=12) -> None:
         '''
-        Writes text to the cv by reading file content
+        Writes text to the cv
         Args:
             file (str): the text file with the content of your CurriculumVitae
             l (int): how much space the text cell must be from the left margin
