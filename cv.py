@@ -16,7 +16,7 @@ class FontNotTTFError(Exception): pass
 class CurriculumVitae(FPDF):
 
     def __init__(self, font: str='Courier', h_font: str='', 
-                 calemoji: str='', bg: str='') -> None:
+            calemoji: str='', bg: str='', font_paths: list[str]=None) -> None:
         '''
         Instantiates the CurriculumVitae class
         Args
@@ -32,6 +32,7 @@ class CurriculumVitae(FPDF):
         super().__init__()
         self.bg: str = bg
         self.font: str = font
+        self.font_paths = font_paths
         self.h_font: str = self._ttf(h_font)
         self.calemoji: str = chr(0x1F5D3) if not calemoji else calemoji
         self.date: str = datetime.today().strftime('%b %Y')
@@ -52,17 +53,17 @@ class CurriculumVitae(FPDF):
             else: font = font + '.ttf'
         return font
 
-    def _font_path(self, paths: list[str]=[]) -> str:
+    def _font_path(self) -> str:
     
-        if not paths:
+        if self.font_paths is None:
             HOME: str = environ['HOME']
-            paths = [ 
+            self.font_paths = [ 
                     HOME + '/.local/share/fonts/', 
                     HOME + '/.fonts',
                     '/usr/share/fonts/TTF/' 
                     ]
         
-        for path in paths:
+        for path in self.font_paths:
             for _, _, fonts in walk(path):
                 if self.h_font in fonts:
                     return path + self.h_font
@@ -103,6 +104,7 @@ class CurriculumVitae(FPDF):
 def main(l_column_text: str, r_column_text: str, 
         font: str='Courier', emoji_font: str ='Symbola',
         bg='',  output_file='cv.pdf', footer=False):
+
     cv = CurriculumVitae(font=font, h_font=emoji_font, bg=bg)
     cv.text_column(l_column_text, 20, 30, 100) # Big Column
     cv.text_column(r_column_text, 130, 110, 60) # Smaller right column
@@ -125,4 +127,4 @@ if __name__ == '__main__':
     import curri_br
     #import curri_en
 
-    main(curri_br.body, curri_br.side_info, bg='bg.jpg')
+    main(curri_br.body_x, curri_br.side_info, bg='bg.jpg')
