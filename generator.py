@@ -135,6 +135,6 @@ def main(*args, font: str='Courier', bg='', outfile='cv.pdf', footer=False):
 
 if __name__ == '__main__':
 
-    from curri import curri_contabilizei as curri
+    from curri import curri
 
-    main((curri.body, 15, 25, 180), bg='bg.jpg', outfile='cv-diegoduarte.pdf')
+    main((curri.body, 15, 25, 180), bg='static/bg.jpg', outfile='cv-diegoduarte.pdf')
