@@ -84,9 +84,13 @@ class CurriculumVitae(FPDF):
         self.set_fill_color(26, 28, 29)
         # White color of the date on the header
         self.set_text_color(255, 255, 255)
-        self.cell(w=0, h=8, align="R", fill=True, txt=self.hdr_text, markdown=True)
+        self.cell(
+            w=0, h=8, align="R", fill=True, txt=self.hdr_text, markdown=True
+        )
 
-    def text_column(self, text: str, l: int, y: int, w: int, size: int = 12) -> None:
+    def text_column(
+        self, text: str, l: int, y: int, w: int, size: int = 12
+    ) -> None:
         """
         Writes text to the cv
         Args:
@@ -136,4 +140,8 @@ if __name__ == "__main__":
 
     from curri import curri
 
-    main((curri.body, 15, 25, 180), bg="static/bg.jpg", outfile="cv-diegoduarte.pdf")
+    main(
+        (curri.body, 15, 25, 180),
+        bg="static/bg.jpg",
+        outfile="cv-diegoduarte.pdf",
+    )
